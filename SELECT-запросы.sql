@@ -19,11 +19,27 @@ SELECT artist_name
 FROM artist
 WHERE artist_name NOT LIKE '% %';
 
+/* Разные способы решения последнего номера */
+SELECT track_name
+FROM track
+WHERE string_to_array(lower(track_name), ' ') && ARRAY['my', 'мой'];
+
 
 SELECT track_name
 FROM track
-WHERE track_name LIKE '%мой%' OR track_name LIKE '%my%';
+WHERE track_name  ~* '\m(my|мой)\M'
 
+
+SELECT track_name
+FROM track
+WHERE track_name ILIKE 'мой %'
+OR track_name ILIKE '% мой'
+OR track_name ILIKE '% мой %'
+OR track_name ILIKE 'мой'
+OR track_name ILIKE 'my %'
+OR track_name ILIKE '% my'
+OR track_name ILIKE '% my %'
+OR track_name ILIKE 'my';
 
 
 
@@ -94,7 +110,6 @@ WHERE a1.artist_name = 'Freddie Mercury';
 
 
 
-
 /* Задание 4 */
 INSERT INTO artist (artistid, artist_name) VALUES
 (7, 'John Doe'),
@@ -120,12 +135,12 @@ INSERT INTO track (trackid, track_name, albumid, duration) VALUES
 (9, 'Genre Fusion', 5, 225),
 (10, 'Classic Rock Hit', 6, 260);
 
-
-SELECT a.album_name
-FROM album a
-JOIN artist_album aa ON a.albumid = aa.albumid 
+/* Исправил запрос, уточнив группировку */
+SELECT al.album_name
+FROM album al
+JOIN artist_album aa ON al.albumid = aa.albumid 
 JOIN genre_artist ga ON aa.artistid = ga.artistid 
-GROUP BY a.album_name
+GROUP BY al.album_name, aa.artistid
 HAVING COUNT(DISTINCT ga.genreid) > 1;
 
 
